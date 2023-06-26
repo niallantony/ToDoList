@@ -1,4 +1,6 @@
-const pubSub = (() => {
+
+
+const pubSub =(() => {
 
     const subscriptions = {};
     const hOP = subscriptions.hasOwnProperty;
@@ -6,12 +8,14 @@ const pubSub = (() => {
     const publish = (event,data) => {
         //if topic doesn't exist, do nothing
         if (!hOP.call(subscriptions,event)) {
+            console.log(event + ': No such event, or no subscribers!', subscriptions);
             return;
         }
 
         //activate subscribers
         subscriptions[event].forEach((item) => {
             item(data != undefined ? data : {});
+            console.log('Published ' + event + ' with ' + data);
         })
     }
 
@@ -21,7 +25,7 @@ const pubSub = (() => {
             throw new Error('callback is missing from subscribe: ' + event);
         }
         // error if not a function
-        if (typeof callback !== 'function') {
+        if (typeof callback !== 'function') {``
             throw new Error('callback is not a function from subscribe: ' + event);
         }
         //make event if none exists
@@ -29,8 +33,9 @@ const pubSub = (() => {
             subscriptions[event] = [];
         }
         //push subscriber to event
-        const index = subscriptions[event].push(callback) -1;
-        //add method to remove
+        const index = subscriptions[event].push(callback) - 1;
+        console.log('New subscriber to event: ' + event , subscriptions);
+        // add method to remove
         const remove = () => {
             subscriptions[event].splice(index,1);
         }
@@ -38,5 +43,7 @@ const pubSub = (() => {
     }
 
 
-    return {publish, subscribe};
-})
+    return {publish, subscribe, subscriptions};
+})()
+
+export default pubSub;
