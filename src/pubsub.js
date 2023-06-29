@@ -15,7 +15,7 @@ const pubSub =(() => {
         //activate subscribers
         subscriptions[event].forEach((item) => {
             item(data != undefined ? data : {});
-            console.log('Published ' + event + ' with ' + data);
+            console.log('Published ' + event + ' with ' + JSON.stringify(data));
         })
     }
 

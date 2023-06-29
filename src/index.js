@@ -1,5 +1,5 @@
 import pubSub from "./pubsub.js";
-import toDoList from "./list.js";
+import {toDoList, lists} from "./list.js";
 import './style.css';
 
 const screenController = (() => {
@@ -15,7 +15,7 @@ const screenController = (() => {
     const newItemButton = () => {
         const body = document.querySelector('body');
         const button = document.createElement('button');
-        button.textContent = 'newItem';
+        button.textContent = 'New Item';
         body.appendChild(button);
         button.addEventListener('click', () => {
             const name = prompt('Name of Item?');
@@ -24,8 +24,8 @@ const screenController = (() => {
         })
     }
     
-    const newListItem = (name,description) => {
-        const input = {name: name, description: description};
+    const newListItem = (name,description,list = 'default') => {
+        const input = {name: name, description: description, listName: list};
         pubSub.publish('newItem',input);
     }
 
@@ -34,7 +34,7 @@ const screenController = (() => {
         list.forEach((item) => {
             const container = document.createElement('div');
             container.id = item.index;
-            container.textContent = `${item.name} : ${item.description}`
+            container.textContent = item.itemContent;
             content.appendChild(container);
         })
     }
@@ -44,33 +44,6 @@ const screenController = (() => {
 
 })();
 
-// const toDoList = (() => {
-
-//     const list = [];
-//     const Item = (name, description, index) => {
-//         const remove = () => {
-//             list.splice(index,1);
-//             console.log(name + ' removed from list');
-//         }
-        
-//         return {
-//             name,
-//             description,
-//             remove,
-//         }
-//     }
-    
-    
-//     const newItem = (input) => {
-//         const newEntry = Item(input.name, input.description, list.length);
-//         list.push(newEntry);
-//         pubSub.publish('updateList', list);
-//     }
-    
-//     const newItemSubscription = pubSub.subscribe('newItem',newItem);
-//     console.log('To Do List Initialised');
-// })();
-
-    console.table(pubSub.subscriptions);
+console.table(pubSub.subscriptions);
 
 export default screenController;
