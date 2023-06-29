@@ -1,0 +1,28 @@
+#container {
+    height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 5fr;
+}
+
+#content,
+#sidebar {
+    margin: 1rem;
+    display: flex;
+    flex-direction: column;
+}
+
+#content {
+    grid-column: 2 / 3;
+}
+
+#sidebar {
+    grid-area: 1 / 1 / 2 / 2 ;
+}
+
+.sidebar-title {
+    margin-bottom: 1rem;
+}
+
+.list div {
+    margin: 1rem;
+}
