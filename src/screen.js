@@ -1,3 +1,4 @@
+import { doc } from "prettier";
 import pubSub from "./pubsub";
 
 const screenController = (() => {
@@ -5,36 +6,39 @@ const screenController = (() => {
     const container = document.getElementById("content");
     container.innerHTML = "";
     container.appendChild(content);
-    newItemButton();
   };
+  const updateSubscription = pubSub.subscribe("updateScreen", updateScreen);
 
-  const newItemButton = () => {
-    const body = document.getElementById("content");
-    const button = document.createElement("button");
-    button.textContent = "New Item";
-    body.appendChild(button);
-    button.addEventListener("click", () => {
-        pubSub.publish('makeModal')
-    });
-  };
-
-  const initialiseScreen = (() => {
+const loadFirstProject = (projects) => {
+    const firstProject = projects[Object.keys(projects)[0]];
+    console.log(projects);
+    console.log('First Project = ', firstProject);
+    pubSub.publish('publishList',firstProject);
+}
+const initialiseScreen = (() => {
     const body = document.querySelector("body");
     const container = document.createElement("div");
     container.id = "container";
     body.appendChild(container);
-    const content = document.createElement("div");
-    content.id = "content";
+    const content = document.createElement('div');
+    content.id = 'content';
     container.appendChild(content);
-    newItemButton();
-  })();
+    const getProjectsSubscription = pubSub.subscribe('receiveList',loadFirstProject)
+    pubSub.publish('sendList');
+    getProjectsSubscription.remove();
+    const modal = document.createElement("dialog");
+    modal.classList.add("dialog-modal");
+    modal.id = 'form-modal'
+    container.appendChild(modal);
+})();
 
-  const newListItem = (name, description, list = "default") => {
+
+const newListItem = (name, description, list = "default") => {
     const input = { name: name, description: description, listName: list };
     pubSub.publish("newItem", input);
-  };
+};
 
-  const updateSubscription = pubSub.subscribe("updateScreen", updateScreen);
+
 })();
 
 const inputModal = (() => {
@@ -45,15 +49,15 @@ const inputModal = (() => {
     for (const list of Object.keys(projects)) {
       console.table(projects[list]);
       const newOption = document.createElement("option");
-      newOption.value = projects[list].index;
+      newOption.value = projects[list].name;
       newOption.textContent = projects[list].name;
       selectBox.appendChild(newOption);
     };
     pubSub.publish('receiveSelect', selectBox);
   };
 
-  const makeModal = () => {
-    const container = document.getElementById("container");
+  const makeModal = (forList) => {
+    const modal = document.getElementById('form-modal');
     const getQueriesSubscription = pubSub.subscribe(
       "receiveQueries",
       makeInputs
@@ -62,14 +66,29 @@ const inputModal = (() => {
       "receiveList",
       createSelect
     );
-    const modal = document.createElement("dialog");
-    modal.classList.add("dialog-modal");
     const newForm = document.createElement("form");
     newForm.classList.add("input-form");
     newForm.id = "modal-form";
-    container.appendChild(modal);
     modal.appendChild(newForm);
     pubSub.publish("sendQueries");
+    const selectBox = newForm.querySelector('select');
+    selectBox.setAttribute('selected',forList);
+    const submitButton = document.createElement('button');
+    submitButton.classList.add('modal-submit');
+    submitButton.textContent = 'Add Task';
+    newForm.appendChild(submitButton);
+    newForm.addEventListener("submit",(e) => {
+        const formData = {};
+        Array.from(newForm.elements).forEach((input) => {
+            e.preventDefault();
+            formData[input.name] = input.value;
+            modal.close();
+            modal.innerHTML = '';
+            getProjectSubscription.remove();
+            getQueriesSubscription.remove();
+        });
+        pubSub.publish('newItem',formData);
+    });
     modal.showModal();
   };
 
