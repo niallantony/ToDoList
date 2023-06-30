@@ -53,8 +53,6 @@ const toDoList = (() => {
     }
     const sendQueriesSubscription = pubSub.subscribe('sendQueries',sendQueries);
     const newItemSubscription = pubSub.subscribe('newItem',newItem);
-    console.table(pubSub.subscriptions);
-
 })();
 
 const lists = (() => {
@@ -102,6 +100,13 @@ const lists = (() => {
         }
     }
 
+    const loadFirstProject = (projects) => {
+        const firstProject = projects[Object.keys(projects)[0]];
+        console.log(projects);
+        console.log('First Project = ', firstProject);
+        pubSub.publish('publishList',firstProject);
+    }
+
     const sendList = () => {
         pubSub.publish('receiveList',projectList);
     }
@@ -116,15 +121,18 @@ const lists = (() => {
     const newProject = (input) => {
         const newEntry = Project(input.name,Object.keys(projectList).length);
         projectList[newEntry.name] = newEntry;
+        console.table(projectList);
+        console.log('New Project Made!', newEntry);
         pubSub.publish('addProject', newEntry);
         pubSub.publish('updateProjectList', projectList);
     }
-    newProject({name: 'default'});
-
+    const newProjectSub = pubSub.subscribe('newProject',newProject);
     const publishListSub = pubSub.subscribe('publishList', list => list.publishContents())
     const updateListSubscription = pubSub.subscribe('updateList',updateList);
     const sendListSubscription = pubSub.subscribe('sendList', sendList);
     const addEntrySubscription = pubSub.subscribe('addToList', addItemToList);
+    const getProjectsSubscription = pubSub.subscribe('firstProjectRequest',loadFirstProject);
+
 })();
 
 export {

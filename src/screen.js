@@ -6,16 +6,11 @@ const screenController = (() => {
     const container = document.getElementById("content");
     container.innerHTML = "";
     container.appendChild(content);
+    console.log('We got this far...');
   };
-  const updateSubscription = pubSub.subscribe("updateScreen", updateScreen);
+  
 
-const loadFirstProject = (projects) => {
-    const firstProject = projects[Object.keys(projects)[0]];
-    console.log(projects);
-    console.log('First Project = ', firstProject);
-    pubSub.publish('publishList',firstProject);
-}
-const initialiseScreen = (() => {
+  const initialiseScreen = () => {
     const body = document.querySelector("body");
     const container = document.createElement("div");
     container.id = "container";
@@ -23,22 +18,14 @@ const initialiseScreen = (() => {
     const content = document.createElement('div');
     content.id = 'content';
     container.appendChild(content);
-    const getProjectsSubscription = pubSub.subscribe('receiveList',loadFirstProject)
-    pubSub.publish('sendList');
-    getProjectsSubscription.remove();
     const modal = document.createElement("dialog");
     modal.classList.add("dialog-modal");
     modal.id = 'form-modal'
     container.appendChild(modal);
-})();
-
-
-const newListItem = (name, description, list = "default") => {
-    const input = { name: name, description: description, listName: list };
-    pubSub.publish("newItem", input);
-};
-
-
+  };
+  
+  const updateSubscription = pubSub.subscribe("updateScreen", updateScreen);
+  const initialiseSub = pubSub.subscribe('initialise',initialiseScreen);
 })();
 
 const inputModal = (() => {
@@ -140,18 +127,18 @@ const sideBar = (() => {
     title.textContent = "Projects";
     title.classList.add("sidebar-title");
     sidebar.appendChild(title);
-    return sidebar;
+    makeSideBarSub.remove();
   };
 
   const addToSideBar = (project) => {
+    const sidebar = document.getElementById('sidebar');
     const projectButton = document.createElement("button");
     projectButton.classList.add("project-button");
     projectButton.textContent = project.name;
-    sideBar.appendChild(projectButton);
+    sidebar.appendChild(projectButton);
   };
 
-  const sideBar = initialiseSideBar();
-
+  const makeSideBarSub = pubSub.subscribe('makeSideBar', initialiseSideBar);
   const addSideBarSubscription = pubSub.subscribe("addProject", addToSideBar);
 })();
 
