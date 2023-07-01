@@ -67,9 +67,16 @@ const lists = (() => {
         const content = document.createElement('div');
         content.classList.add('list');
         content.id = list.name;
+        const title = document.createElement('div');
+        title.classList.add('project-title');
+        title.textContent = list.name;
+        content.appendChild(title);
+        const horRule = document.createElement('hr');
+        content.appendChild(horRule);
         list.projectContents.forEach((item) => {
             const container = document.createElement('div');
             container.id = `item-${item.index}`;
+            container.classList.add('todo-item');
             container.textContent = item.itemContent;
             content.appendChild(container);
         })

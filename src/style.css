@@ -1,7 +1,17 @@
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+
+:root {
+    --background: #3B3B3B;
+    --text-main: #FCFCFC;
+    font-family: 'VT323','Lucida Console', Courier, monospace;
+}
+
 #container {
     height: 100vh;
     display: grid;
     grid-template-columns: 1fr 5fr;
+    background-color: var(--background);
+    padding: 1rem;
 }
 
 #content,
@@ -13,16 +23,92 @@
 
 #content {
     grid-column: 2 / 3;
+    padding: 2rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px,1fr));
 }
 
 #sidebar {
     grid-area: 1 / 1 / 2 / 2 ;
+    background-color: var(--background);
+    padding: 2rem;
+    color: var(--text-main);
+    border-right: 2px dashed var(--text-main);
 }
 
 .sidebar-title {
     margin-bottom: 1rem;
 }
 
+.list {
+    border: 2px dashed var(--text-main);
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+}
+
+.list hr {
+    margin: 0 0 1rem 0;
+    border-top: 2px dashed var(--text-main);
+    border-bottom: 0;
+    width: 75%;
+}
+
 .list div {
-    margin: 1rem;
+    margin-bottom: 1rem;
+    color: var(--text-main);
+}
+
+.todo-item:hover {
+    background-color: #4B4B4B;
+}
+
+
+button:hover {
+    filter: brightness(120%);
+}
+
+
+button {
+    background-color: var(--background);
+    color: var(--text-main);
+    border: 2px solid var(--text-main);
+    padding: 1rem;
+    font-family: inherit;
+}
+
+
+
+dialog {
+    background-color: var(--background);
+    border: 2px solid var(--text-main);
+    color: var(--text-main);
+}
+
+dialog form {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 1rem;
+}
+
+form label {
+    margin-right: 1rem;
+    text-align: right;
+}
+
+form input {
+    border: 2px solid var(--text-main);
+    background-color: var(--background);
+    color: var(--text-main);
+}
+
+select {
+    background-color: var(--background);
+    color: var(--text-main);
+    font: inherit;
+    border: 2px solid var(--text-main);
+}
+
+form button {
+    grid-column: 1 / 3;
 }

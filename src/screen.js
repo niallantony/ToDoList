@@ -6,7 +6,6 @@ const screenController = (() => {
     const container = document.getElementById("content");
     container.innerHTML = "";
     container.appendChild(content);
-    console.log('We got this far...');
   };
   
 
@@ -34,7 +33,6 @@ const inputModal = (() => {
     selectBox.setAttribute("name", "lists");
     selectBox.id = "select-lists";
     for (const list of Object.keys(projects)) {
-      console.table(projects[list]);
       const newOption = document.createElement("option");
       newOption.value = projects[list].name;
       newOption.textContent = projects[list].name;
@@ -81,12 +79,9 @@ const inputModal = (() => {
 
   const makeInputs = (queries) => {
     const newForm = document.getElementById("modal-form");
-    console.log('making inputs')
     queries.forEach((section) => {
-      console.log(section.type);
       switch (section.type) {
         case "input": {
-            console.log('new input');
           const newInput = document.createElement("input");
           newInput.id = `input-${section.name}`;
           newInput.required = section.required;
@@ -101,7 +96,10 @@ const inputModal = (() => {
           break;
         }
         case "select": {
-          console.log('new select');
+          const newLabel = document.createElement("label");
+          newLabel.setAttribute("for", `input-${section.name}`);
+          newLabel.textContent = section.name;
+          newForm.appendChild(newLabel);
           const selectSub = pubSub.subscribe('receiveSelect',(selectBox) => {
             newForm.appendChild(selectBox);
           })
