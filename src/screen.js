@@ -26,8 +26,6 @@ const screenController = (() => {
   const listClick = (event) => {
     const clickedItem = event.target.closest('.todo-item');
     if (!clickedItem) return;
-    const itemIndex = clickedItem.id.substring(5);
-    console.log(itemIndex);
     pubSub.publish('itemMenu',clickedItem);
   }
 
@@ -38,7 +36,12 @@ const screenController = (() => {
     const doneButton = document.createElement('button');
     doneButton.id = 'menu-done';
     doneButton.textContent = 'done';
-    doneButton.addEventListener('click',() => pubSub.publish('itemDone',item));
+    doneButton.addEventListener('click',(event) => {
+      event.stopPropagation();
+      pubSub.publish('itemDone',event.target.parentElement.parentElement);
+      menuPan.innerHTML = '';
+      menuPan.parentElement.removeChild(menuPan);
+    });
     const editButton = document.createElement('button');
     editButton.textContent = 'edit';
     editButton.id = 'menu-edit';    

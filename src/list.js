@@ -5,14 +5,11 @@ const toDoList = (() => {
     const Item = (name, description, listName) => {
         let itemIndex = 0;
         let done = false;
+
         const toggleDone = () => {
-            done = (!done);
-            console.log(item.name + ' Done!');
-        }
-    
-        const remove = () => {
-            list.splice(index,1);
-            console.log(name + ' removed from list');
+            console.log(done);
+            done = !done;
+            console.log(name + ' Done!', done);
         }
 
         
@@ -27,12 +24,13 @@ const toDoList = (() => {
             get index() {
                 return itemIndex;
             },
+            get done() {
+                return done;
+            },
             name,
             description,
             listName,
-            done,
             toggleDone,
-            remove,
         }
     }
 
@@ -88,6 +86,9 @@ const lists = (() => {
             container.classList.add('todo-item');
             container.textContent = item.itemContent;
             content.appendChild(container);
+            if (item.done) {
+                container.classList.add('done');
+            };
         })
         const button = document.createElement("button");
         button.textContent = "New Item";
@@ -102,17 +103,23 @@ const lists = (() => {
     const Project = (name, index) => {
         const projectContents = [];
         const addEntry = (entry) => {
-            entry.index = Object.keys(projectList).length;
+            entry.index = projectContents.length;
             projectContents.push(entry);
             pubSub.publish('updateList',{name:name, projectContents:projectContents});
         }
         const publishContents = () => {
             pubSub.publish('updateList',{name:name, projectContents:projectContents});
         }
+        const doneTask = (task) => {
+            const project = projectContents[task];
+            project.toggleDone();
+            // projectContents[task] = [project];
+            }
         return {
             name,
             index,
             addEntry,
+            doneTask,
             publishContents
         }
     }
@@ -140,7 +147,8 @@ const lists = (() => {
         const list = item.parentElement.id;
         console.log(itemIndex);
         const project = projectList[list]
-        project[itemIndex].toggleDone();
+        project.doneTask(+itemIndex);
+        project.publishContents();
     }
 
     const newProject = (input) => {
