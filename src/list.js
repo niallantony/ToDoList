@@ -4,6 +4,11 @@ const toDoList = (() => {
 
     const Item = (name, description, listName) => {
         let itemIndex = 0;
+        let done = false;
+        const toggleDone = () => {
+            done = (!done);
+            console.log(item.name + ' Done!');
+        }
     
         const remove = () => {
             list.splice(index,1);
@@ -22,7 +27,11 @@ const toDoList = (() => {
             get index() {
                 return itemIndex;
             },
+            name,
+            description,
             listName,
+            done,
+            toggleDone,
             remove,
         }
     }
@@ -86,6 +95,7 @@ const lists = (() => {
         button.addEventListener("click", () => {
             pubSub.publish('makeModal',list.name)
         });
+        content.addEventListener('click',event => pubSub.publish('listClick',event));
         pubSub.publish('updateScreen',content);
     }
 
@@ -125,6 +135,14 @@ const lists = (() => {
         projectList[input.listName].addEntry(input);
     }
 
+    const itemDone = (item) => {
+        const itemIndex = item.id.substring(5);
+        const list = item.parentElement.id;
+        console.log(itemIndex);
+        const project = projectList[list]
+        project[itemIndex].toggleDone();
+    }
+
     const newProject = (input) => {
         const newEntry = Project(input.name,Object.keys(projectList).length);
         projectList[newEntry.name] = newEntry;
@@ -133,6 +151,7 @@ const lists = (() => {
         pubSub.publish('addProject', newEntry);
         pubSub.publish('updateProjectList', projectList);
     }
+    const itemDoneSub = pubSub.subscribe('itemDone',itemDone);
     const newProjectSub = pubSub.subscribe('newProject',newProject);
     const publishListSub = pubSub.subscribe('publishList', list => list.publishContents())
     const updateListSubscription = pubSub.subscribe('updateList',updateList);

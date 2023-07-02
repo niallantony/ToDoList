@@ -22,7 +22,33 @@ const screenController = (() => {
     modal.id = 'form-modal'
     container.appendChild(modal);
   };
+
+  const listClick = (event) => {
+    const clickedItem = event.target.closest('.todo-item');
+    if (!clickedItem) return;
+    const itemIndex = clickedItem.id.substring(5);
+    console.log(itemIndex);
+    pubSub.publish('itemMenu',clickedItem);
+  }
+
+  const itemMenu = (item) => {
+    const menuPan = document.createElement('div');
+    menuPan.classList.add('menu');
+    item.appendChild(menuPan);
+    const doneButton = document.createElement('button');
+    doneButton.id = 'menu-done';
+    doneButton.textContent = 'done';
+    doneButton.addEventListener('click',() => pubSub.publish('itemDone',item));
+    const editButton = document.createElement('button');
+    editButton.textContent = 'edit';
+    editButton.id = 'menu-edit';    
+    editButton.addEventListener('click',() => pubSub.publish('itemEdit',item));
+    menuPan.appendChild(doneButton);
+    menuPan.appendChild(editButton);
+  }
   
+  const itemMenuSub = pubSub.subscribe('itemMenu', itemMenu);
+  const listClickSub = pubSub.subscribe('listClick', listClick);
   const updateSubscription = pubSub.subscribe("updateScreen", updateScreen);
   const initialiseSub = pubSub.subscribe('initialise',initialiseScreen);
 })();

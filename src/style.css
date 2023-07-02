@@ -6,6 +6,11 @@
     font-family: 'VT323','Lucida Console', Courier, monospace;
 }
 
+body {
+    margin:0;
+    padding:0;
+}
+
 #container {
     height: 100vh;
     display: grid;
@@ -57,6 +62,12 @@
 .list div {
     margin-bottom: 1rem;
     color: var(--text-main);
+    position: relative;
+}
+
+.menu {
+    position:absolute;
+    bottom: 0;
 }
 
 .todo-item:hover {
