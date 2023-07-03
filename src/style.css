@@ -54,6 +54,17 @@ body {
     border-right: 2px dashed var(--text-main);
 }
 
+.list-container {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    margin-bottom: 1rem;
+}
+
+.date-container {
+    margin: 0;
+    min-width:fit-content;
+}
+
 .sidebar-title {
     margin-bottom: 1rem;
 }
@@ -81,7 +92,6 @@ body {
 }
 
 .list div {
-    margin-bottom: 1rem;
     color: var(--text-main);
     position: relative;
 }
@@ -95,7 +105,7 @@ body {
     margin: 1rem;
 }
 
-.todo-item:hover {
+.list-container:hover {
     background-color: #4B4B4B;
 }
 

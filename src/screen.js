@@ -157,6 +157,20 @@ const inputModal = (() => {
           newForm.appendChild(newInput);
           break;
         }
+        case 'date': {
+          const newInput = document.createElement("input");
+          newInput.id = `input-${section.name}`;
+          newInput.required = section.required;
+          newInput.setAttribute("type", "date");
+          newInput.setAttribute("name", section.name);
+          const newLabel = document.createElement("label");
+          newLabel.setAttribute("for", `input-${section.name}`);
+          newLabel.textContent = section.name;
+          newInput.classList.add("date-input");
+          newForm.appendChild(newLabel);
+          newForm.appendChild(newInput);
+          break;
+        }
         case "select": {
           const newLabel = document.createElement("label");
           newLabel.setAttribute("for", `input-${section.name}`);
@@ -203,6 +217,9 @@ const sideBar = (() => {
     const projectButton = document.createElement("button");
     projectButton.classList.add("project-button");
     projectButton.textContent = project.name;
+    projectButton.addEventListener('click',() => {
+      pubSub.publish('publishList',project);
+    })
     sidebar.appendChild(projectButton);
   };
 

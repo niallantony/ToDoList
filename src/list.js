@@ -2,7 +2,7 @@ import pubSub from "./pubsub";
 
 const toDoList = (() => {
 
-    const Item = (name, description, listName) => {
+    const Item = (name, description, listName, dueDate) => {
         let itemIndex = 0;
         let done = false;
 
@@ -29,6 +29,7 @@ const toDoList = (() => {
             name,
             description,
             listName,
+            dueDate,
             toggleDone,
         }
     }
@@ -46,6 +47,11 @@ const toDoList = (() => {
                 required:true,
             },
             {
+                name:'due',
+                type:'date',
+                required:true,
+            },
+            {
                 name:'lists',
                 type:'select',
                 required:true,
@@ -55,7 +61,7 @@ const toDoList = (() => {
     }
     
     const newItem = (input) => {
-        pubSub.publish('addToList', Item(input.name, input.description, input.lists));
+        pubSub.publish('addToList', Item(input.name, input.description, input.lists, input.due));
     }
     const sendQueriesSubscription = pubSub.subscribe('sendItemQueries',sendQueries);
     const newItemSubscription = pubSub.subscribe('newItem',newItem);
@@ -80,14 +86,22 @@ const lists = (() => {
         const horRule = document.createElement('hr');
         content.appendChild(horRule);
         list.projectContents.forEach((item) => {
+            const listContainer = document.createElement('div');
+            listContainer.classList.add('list-container');
+            content.appendChild(listContainer);
             const container = document.createElement('div');
+            listContainer.appendChild(container);
             container.id = `item-${item.index}`;
             container.classList.add('todo-item');
             container.textContent = item.itemContent;
-            content.appendChild(container);
+            listContainer.appendChild(container);
             if (item.done) {
                 container.classList.add('done');
             };
+            const dateContainer = document.createElement('div');
+            dateContainer.classList.add('date-container');
+            dateContainer.textContent = item.dueDate;
+            listContainer.appendChild(dateContainer);
         })
         const button = document.createElement("button");
         button.textContent = "New Item";
@@ -157,7 +171,7 @@ const lists = (() => {
 
     const itemDone = (item) => {
         const itemIndex = item.id.substring(5);
-        const list = item.parentElement.id;
+        const list = item.parentElement.parentElement.id;
         const project = projectList[list]
         project.doneTask(+itemIndex);
         project.publishContents();
