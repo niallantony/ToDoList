@@ -136,6 +136,9 @@ const lists = (() => {
             }
             console.log('reorganised', projectContents);
         }
+        const populateContents = (contents) => {
+            contents.forEach((item) => projectContents.push(item));
+        }
         const publishContents = () => {
             reorganiseList();
             pubSub.publish('updateList',{name:name, projectContents:projectContents});
@@ -180,6 +183,7 @@ const lists = (() => {
             doneTask,
             publishContents,
             editTaskStart,
+            populateContents,
         }
     }
 
