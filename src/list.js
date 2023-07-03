@@ -10,8 +10,10 @@ const toDoList = (() => {
             done = !done;
             console.log(name + ' Done!', done);
         }
-
-        
+        const changeValues = (inputs) => {
+            name = inputs.name;
+            description = inputs.description;
+        }
         
         return {
             get itemContent() {
@@ -131,13 +133,27 @@ const lists = (() => {
         const doneTask = (task) => {
             const project = projectContents[task];
             project.toggleDone();
+        }
+        const editTaskStart = (task) => {
+            const editTaskEnd = (inputs) => {
+                project.changeValues(inputs);
+                changeTaskSub.remove();
             }
+            const project = projectContents[task];
+            const changeTaskSub = pubSub.subscribe('editTaskEnd',editTaskEnd)
+            pubSub.publish('makeModal',{list:name, action:'editTaskEnd', assigned:{
+                name:project.name,
+                description:project.description,
+                due:project.dueDate,
+            }});
+        }
         return {
             name,
             index,
             addEntry,
             doneTask,
-            publishContents
+            publishContents,
+            editTaskStart,
         }
     }
 
@@ -182,6 +198,14 @@ const lists = (() => {
         project.publishContents();
     }
 
+    const itemEdit = (item) => {
+        const itemIndex = item.id.substring(5);
+        const list = item.parentElement.parentElement.id;
+        const project = projectList[list];
+        project.editTaskStart(+itemIndex);
+        project.publishContents();
+    }
+
     const newProject = (input) => {
         const entries = Object.entries(projectList);
         let exists = false;
@@ -205,6 +229,7 @@ const lists = (() => {
         }
     }
 
+    const itemEditSub = pubSub.subscribe('itemEdit', itemEdit);
     const makeProjectSub = pubSub.subscribe('makeProject',makeProject);
     const sendQueriesSubscription = pubSub.subscribe('sendProjectQueries', sendQueries);
     const itemDoneSub = pubSub.subscribe('itemDone',itemDone);

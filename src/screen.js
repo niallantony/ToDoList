@@ -124,6 +124,9 @@ const inputModal = (() => {
       case 'newItem' :
         pubSub.publish("sendItemQueries");
         break;
+      case 'editTaskEnd' :
+        pubSub.publish("sendItemQueries");
+        break;
       case 'newProject' :
         pubSub.publish('sendProjectQueries');
         break;
@@ -134,6 +137,13 @@ const inputModal = (() => {
       for (let i = 0 ; i < selections.length ; i++) {
         if (selections[i].value === forList.list) selections[i].selected = true;
       }
+    }
+    if (forList.hasOwnProperty('assigned')) {
+      const keys = Object.keys(forList.assigned);
+      keys.forEach((key) => {
+        const formElement = document.getElementById(`input-${key}`);
+        formElement.value = forList.assigned[key];
+      })
     }
     const buttonContainer = document.createElement('div');
     buttonContainer.classList.add('button-container');
