@@ -14,6 +14,11 @@ const screenController = (() => {
     };
     contentDiv.appendChild(content);
   };
+
+  const removeList = (list) => {
+    list.innerHTML = '';
+    list.parentElement.removeChild(list);
+  }
   
 
   const initialiseScreen = () => {
@@ -56,7 +61,31 @@ const screenController = (() => {
     menuPan.appendChild(doneButton);
     menuPan.appendChild(editButton);
   }
+
+  const listExistError = () => {
+    console.log('Error found...');
+    const container = document.getElementById('container');
+    const dialog = document.createElement('dialog');
+    const errorMessage = document.createElement('div');
+    const confirmButton = document.createElement('button');
+    container.appendChild(dialog);
+    dialog.appendChild(errorMessage);
+    dialog.appendChild(confirmButton);
+    dialog.classList.add('error-message');
+    dialog.show();
+    errorMessage.textContent =  'list already exists!';
+    confirmButton.textContent = 'ok';
+    confirmButton.addEventListener('click', () => {
+      pubSub.publish('makeProject');
+      dialog.close();
+      dialog.innerHTML = '';
+      dialog.parentElement.removeChild(dialog);
+    });
+  }
+    
   
+  const listExistSub = pubSub.subscribe('listExistError',listExistError);
+  const removeListSub = pubSub.subscribe('removeList',removeList);
   const itemMenuSub = pubSub.subscribe('itemMenu', itemMenu);
   const listClickSub = pubSub.subscribe('listClick', listClick);
   const updateSubscription = pubSub.subscribe("updateScreen", updateScreen);
@@ -106,10 +135,24 @@ const inputModal = (() => {
         if (selections[i].value === forList.list) selections[i].selected = true;
       }
     }
+    const buttonContainer = document.createElement('div');
+    buttonContainer.classList.add('button-container');
+    newForm.appendChild(buttonContainer);
     const submitButton = document.createElement('button');
     submitButton.classList.add('modal-submit');
-    submitButton.textContent = 'Add Task';
-    newForm.appendChild(submitButton);
+    submitButton.textContent = 'add task';
+    submitButton.setAttribute('type','submit');
+    const cancelButton = document.createElement('button');
+    cancelButton.classList.add('modal-cancel');
+    cancelButton.textContent = 'cancel'
+    cancelButton.addEventListener('click',() => {
+      getProjectSubscription.remove();
+      getQueriesSubscription.remove();
+      modal.innerHTML = '';
+      modal.close();
+    });
+    buttonContainer.appendChild(submitButton);
+    buttonContainer.appendChild(cancelButton);
     newForm.addEventListener("submit",(e) => {
         const formData = {};
         Array.from(newForm.elements).forEach((input) => {

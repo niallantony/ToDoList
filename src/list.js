@@ -49,7 +49,7 @@ const toDoList = (() => {
             {
                 name:'due',
                 type:'date',
-                required:true,
+                required:false,
             },
             {
                 name:'lists',
@@ -85,6 +85,11 @@ const lists = (() => {
         content.appendChild(title);
         const horRule = document.createElement('hr');
         content.appendChild(horRule);
+        const closeButton = document.createElement('button');
+        closeButton.innerHTML = '&#xd7';
+        closeButton.classList.add('close');
+        content.appendChild(closeButton);
+        closeButton.addEventListener('click', (e) => {pubSub.publish('removeList',content.parentElement)});
         list.projectContents.forEach((item) => {
             const listContainer = document.createElement('div');
             listContainer.classList.add('list-container');
@@ -178,12 +183,26 @@ const lists = (() => {
     }
 
     const newProject = (input) => {
-        const newEntry = Project(input.name,Object.keys(projectList).length);
-        projectList[newEntry.name] = newEntry;
-        console.table(projectList);
-        console.log('New Project Made!', newEntry);
-        pubSub.publish('addProject', newEntry);
-        pubSub.publish('updateProjectList', projectList);
+        const entries = Object.entries(projectList);
+        let exists = false;
+        for (let i = 0 ; i < entries.length ; i++) {
+            if (input.name === entries[i][0]) {
+                pubSub.publish('listExistError');
+                console.warn('Existing Project', entries[i]);
+                console.log('Aborting...')
+                exists = true;
+                return;
+            }
+        }
+        console.log('Exists? :', exists);
+        if (!exists) {
+            const newEntry = Project(input.name,Object.keys(projectList).length);
+            projectList[newEntry.name] = newEntry;
+            console.table(projectList);
+            console.log('New Project Made!', newEntry);
+            pubSub.publish('addProject', newEntry);
+            pubSub.publish('updateProjectList', projectList);
+        }
     }
 
     const makeProjectSub = pubSub.subscribe('makeProject',makeProject);
