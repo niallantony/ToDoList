@@ -150,7 +150,7 @@ const inputModal = (() => {
     newForm.appendChild(buttonContainer);
     const submitButton = document.createElement('button');
     submitButton.classList.add('modal-submit');
-    submitButton.textContent = 'add task';
+    submitButton.textContent = 'confirm';
     submitButton.setAttribute('type','submit');
     const cancelButton = document.createElement('button');
     cancelButton.classList.add('modal-cancel');

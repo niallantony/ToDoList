@@ -10,11 +10,7 @@ const toDoList = (() => {
             done = !done;
             console.log(name + ' Done!', done);
         }
-        const changeValues = (inputs) => {
-            name = inputs.name;
-            description = inputs.description;
-        }
-        
+
         return {
             get itemContent() {
                 return `${name} : ${description} `
@@ -33,6 +29,7 @@ const toDoList = (() => {
             listName,
             dueDate,
             toggleDone,
+            // changeValues
         }
     }
 
@@ -62,9 +59,14 @@ const toDoList = (() => {
         pubSub.publish('receiveQueries',queries);
     }
     
+    const changeValues = (input) => {
+        pubSub.publish('changedItem', Item(input.name, input.description, input.lists, input.due));
+    }
+
     const newItem = (input) => {
         pubSub.publish('addToList', Item(input.name, input.description, input.lists, input.due));
     }
+    const changeItemSub = pubSub.subscribe('changeValues',changeValues);
     const sendQueriesSubscription = pubSub.subscribe('sendItemQueries',sendQueries);
     const newItemSubscription = pubSub.subscribe('newItem',newItem);
 })();
@@ -136,11 +138,17 @@ const lists = (() => {
         }
         const editTaskStart = (task) => {
             const editTaskEnd = (inputs) => {
-                project.changeValues(inputs);
-                changeTaskSub.remove();
+                const changeItem = pubSub.subscribe('changedItem',(item) => {
+                    item.index = task;
+                    projectContents[task] = item;
+                    publishContents();
+                    changeItem.remove();
+                });
+                pubSub.publish('changeValues',inputs);
             }
             const project = projectContents[task];
             const changeTaskSub = pubSub.subscribe('editTaskEnd',editTaskEnd)
+            console.log(changeTaskSub);
             pubSub.publish('makeModal',{list:name, action:'editTaskEnd', assigned:{
                 name:project.name,
                 description:project.description,

@@ -150,6 +150,7 @@ body {
 .menu {
     background-color: var(--background);
     border: 2px solid var(--text-main);
+    z-index: 2;
 }
 
 button:hover {
