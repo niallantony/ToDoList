@@ -129,6 +129,12 @@ body {
     width: 75%;
 }
 
+button.list-container {
+    border-top:0;
+    border-left:0;
+    border-right:0;
+}
+
 .list div {
     color: var(--text-main);
     position: relative;
@@ -136,7 +142,7 @@ body {
 
 .list .menu {
     position:absolute;
-    bottom: 0;
+    bottom: 2rem;
 }
 
 .menu button {

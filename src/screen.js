@@ -36,9 +36,10 @@ const screenController = (() => {
   };
 
   const listClick = (event) => {
-    const clickedItem = event.target.closest('.todo-item');
+    const clickedItem = event.target.closest('.list-container');
     if (!clickedItem) return;
-    pubSub.publish('itemMenu',clickedItem);
+    const clickedList = clickedItem.querySelector('.todo-item');
+    pubSub.publish('itemMenu',clickedList);
   }
 
   const itemMenu = (item) => {
@@ -58,8 +59,17 @@ const screenController = (() => {
     editButton.textContent = 'edit';
     editButton.id = 'menu-edit';    
     editButton.addEventListener('click',() => pubSub.publish('itemEdit',item));
+    const cancelButton = document.createElement('button');
+    cancelButton.textContent = 'cancel';
+    cancelButton.id = 'cancel-edit';    
+    cancelButton.addEventListener('click',(event) => {
+      event.stopPropagation();
+      menuPan.innerHTML = '';
+      menuPan.parentElement.removeChild(menuPan);
+    });
     menuPan.appendChild(doneButton);
     menuPan.appendChild(editButton);
+    menuPan.appendChild(cancelButton);
   }
 
   const listExistError = () => {
@@ -142,6 +152,7 @@ const inputModal = (() => {
       const keys = Object.keys(forList.assigned);
       keys.forEach((key) => {
         const formElement = document.getElementById(`input-${key}`);
+        if (!formElement) return;
         formElement.value = forList.assigned[key];
       })
     }

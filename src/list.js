@@ -95,7 +95,7 @@ const lists = (() => {
         content.appendChild(closeButton);
         closeButton.addEventListener('click', (e) => {pubSub.publish('removeList',content.parentElement)});
         list.projectContents.forEach((item) => {
-            const listContainer = document.createElement('div');
+            const listContainer = document.createElement('button');
             listContainer.classList.add('list-container');
             content.appendChild(listContainer);
             const container = document.createElement('div');
@@ -129,7 +129,15 @@ const lists = (() => {
             projectContents.push(entry);
             pubSub.publish('updateList',{name:name, projectContents:projectContents});
         }
+        const reorganiseList = () => {
+            console.log('reorganising', projectContents);
+            for (let i = 0 ; i < projectContents.length ; i++) {
+                projectContents[i].index = i;
+            }
+            console.log('reorganised', projectContents);
+        }
         const publishContents = () => {
+            reorganiseList();
             pubSub.publish('updateList',{name:name, projectContents:projectContents});
         }
         const doneTask = (task) => {
@@ -139,20 +147,30 @@ const lists = (() => {
         const editTaskStart = (task) => {
             const editTaskEnd = (inputs) => {
                 const changeItem = pubSub.subscribe('changedItem',(item) => {
+                    if (item.listName != name) {
+                        console.log('Changing list...');
+                        pubSub.publish('addToList',item);
+                        changeItem.remove();
+                        projectContents.splice(task,1);
+                        publishContents();
+                        changeTaskSub.remove();
+                        return;
+                    }
                     item.index = task;
                     projectContents[task] = item;
                     publishContents();
                     changeItem.remove();
+                    changeTaskSub.remove();
                 });
                 pubSub.publish('changeValues',inputs);
             }
             const project = projectContents[task];
             const changeTaskSub = pubSub.subscribe('editTaskEnd',editTaskEnd)
-            console.log(changeTaskSub);
             pubSub.publish('makeModal',{list:name, action:'editTaskEnd', assigned:{
                 name:project.name,
                 description:project.description,
                 due:project.dueDate,
+                lists:project.listName,
             }});
         }
         return {
