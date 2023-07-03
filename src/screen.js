@@ -4,8 +4,15 @@ import pubSub from "./pubsub";
 const screenController = (() => {
   const updateScreen = (content) => {
     const container = document.getElementById("content");
-    container.innerHTML = "";
-    container.appendChild(content);
+    let contentDiv;
+    if  (document.getElementById(`content-${content.id}`)) {
+      contentDiv = document.getElementById(`content-${content.id}`)
+    } else {
+      contentDiv = document.createElement('div');
+      contentDiv.id = `content-${content.id}`;
+      container.appendChild(contentDiv);
+    };
+    contentDiv.appendChild(content);
   };
   
 
@@ -84,9 +91,21 @@ const inputModal = (() => {
     newForm.classList.add("input-form");
     newForm.id = "modal-form";
     modal.appendChild(newForm);
-    pubSub.publish("sendQueries");
-    const selectBox = newForm.querySelector('select');
-    selectBox.setAttribute('selected',forList);
+    switch (forList.action) {
+      case 'newItem' :
+        pubSub.publish("sendItemQueries");
+        break;
+      case 'newProject' :
+        pubSub.publish('sendProjectQueries');
+        break;
+      default: break;
+    }
+    if (newForm.querySelector('select')) { 
+      const selections = newForm.querySelector('select').children;
+      for (let i = 0 ; i < selections.length ; i++) {
+        if (selections[i].value === forList.list) selections[i].selected = true;
+      }
+    }
     const submitButton = document.createElement('button');
     submitButton.classList.add('modal-submit');
     submitButton.textContent = 'Add Task';
@@ -101,7 +120,7 @@ const inputModal = (() => {
             getProjectSubscription.remove();
             getQueriesSubscription.remove();
         });
-        pubSub.publish('newItem',formData);
+        pubSub.publish(forList.action,formData);
     });
     modal.showModal();
   };
@@ -118,6 +137,20 @@ const inputModal = (() => {
           newInput.setAttribute("name", section.name);
           const newLabel = document.createElement("label");
           newLabel.setAttribute("for", `input-${section.name}`);
+          newLabel.textContent = section.name;
+          newInput.classList.add("text-input");
+          newForm.appendChild(newLabel);
+          newForm.appendChild(newInput);
+          break;
+        }
+        case "area": {
+          const newInput = document.createElement("textarea");
+          newInput.id = `input-${section.name}`;
+          newInput.required = section.required;
+          newInput.setAttribute("name", section.name);
+          const newLabel = document.createElement("label");
+          newLabel.setAttribute("for", `input-${section.name}`);
+          newLabel.setAttribute("rows", `4`);
           newLabel.textContent = section.name;
           newInput.classList.add("text-input");
           newForm.appendChild(newLabel);
@@ -154,11 +187,19 @@ const sideBar = (() => {
     title.textContent = "Projects";
     title.classList.add("sidebar-title");
     sidebar.appendChild(title);
+    const sidebarContent = document.createElement('div');
+    sidebarContent.classList.add('project-list');
+    sidebar.appendChild(sidebarContent);
     makeSideBarSub.remove();
+    const newButton = document.createElement('button');
+    newButton.classList.add('new-button');
+    newButton.textContent = 'new project';
+    sidebar.appendChild(newButton);
+    newButton.addEventListener('click',() => {pubSub.publish('makeProject')});
   };
 
   const addToSideBar = (project) => {
-    const sidebar = document.getElementById('sidebar');
+    const sidebar = document.querySelector('.project-list');
     const projectButton = document.createElement("button");
     projectButton.classList.add("project-button");
     projectButton.textContent = project.name;

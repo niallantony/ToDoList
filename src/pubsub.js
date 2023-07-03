@@ -34,7 +34,7 @@ const pubSub =(() => {
         }
         //push subscriber to event
         const index = subscriptions[event].push(callback) - 1;
-        console.log('New subscriber to event: ' + event , subscriptions);
+        // console.log('New subscriber to event: ' + event , subscriptions);
         // add method to remove
         const remove = () => {
             subscriptions[event].splice(index,1);

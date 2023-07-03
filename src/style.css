@@ -14,9 +14,18 @@ body {
 #container {
     height: 100vh;
     display: grid;
-    grid-template-columns: 1fr 5fr;
+    grid-template-columns: 15rem 1fr;
     background-color: var(--background);
     padding: 1rem;
+}
+
+.project-list {
+    margin-bottom: 1rem;
+    border: 1px dashed var(--text-main);
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 #content,
@@ -24,6 +33,10 @@ body {
     margin: 1rem;
     display: flex;
     flex-direction: column;
+}
+
+#content div {
+    margin-right: 1rem;
 }
 
 #content {
@@ -45,8 +58,16 @@ body {
     margin-bottom: 1rem;
 }
 
+.project-button {
+    border-top: 0;
+    border-left: 0;
+    border-right: 0;
+    padding: 0.5rem;
+    width: 100%;
+}
+
 .list {
-    border: 2px dashed var(--text-main);
+    border: 1px dashed var(--text-main);
     display: flex;
     flex-direction: column;
     padding: 1rem;
@@ -70,10 +91,18 @@ body {
     bottom: 0;
 }
 
+.menu button {
+    margin: 1rem;
+}
+
 .todo-item:hover {
     background-color: #4B4B4B;
 }
 
+.menu {
+    background-color: var(--background);
+    border: 2px solid var(--text-main);
+}
 
 button:hover {
     filter: brightness(120%);
@@ -109,10 +138,12 @@ form label {
     text-align: right;
 }
 
-form input {
+form input,
+form textarea {
     border: 2px solid var(--text-main);
     background-color: var(--background);
     color: var(--text-main);
+    font:inherit;
 }
 
 select {

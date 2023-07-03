@@ -7,7 +7,6 @@ const toDoList = (() => {
         let done = false;
 
         const toggleDone = () => {
-            console.log(done);
             done = !done;
             console.log(name + ' Done!', done);
         }
@@ -43,7 +42,7 @@ const toDoList = (() => {
             },
             {
                 name:'description',
-                type:'input',
+                type:'area',
                 required:true,
             },
             {
@@ -58,7 +57,7 @@ const toDoList = (() => {
     const newItem = (input) => {
         pubSub.publish('addToList', Item(input.name, input.description, input.lists));
     }
-    const sendQueriesSubscription = pubSub.subscribe('sendQueries',sendQueries);
+    const sendQueriesSubscription = pubSub.subscribe('sendItemQueries',sendQueries);
     const newItemSubscription = pubSub.subscribe('newItem',newItem);
 })();
 
@@ -94,7 +93,7 @@ const lists = (() => {
         button.textContent = "New Item";
         content.appendChild(button);
         button.addEventListener("click", () => {
-            pubSub.publish('makeModal',list.name)
+            pubSub.publish('makeModal',{list:list.name , action:'newItem'})
         });
         content.addEventListener('click',event => pubSub.publish('listClick',event));
         pubSub.publish('updateScreen',content);
@@ -113,7 +112,6 @@ const lists = (() => {
         const doneTask = (task) => {
             const project = projectContents[task];
             project.toggleDone();
-            // projectContents[task] = [project];
             }
         return {
             name,
@@ -142,10 +140,24 @@ const lists = (() => {
         projectList[input.listName].addEntry(input);
     }
 
+    const makeProject = () => {
+        pubSub.publish('makeModal',{action:'newProject'});
+    }
+
+    const sendQueries = () => {
+        const queries = [
+            {
+                name: 'name',
+                type: 'input',
+                require: true,
+            }
+        ]
+        pubSub.publish('receiveQueries',queries);
+    }
+
     const itemDone = (item) => {
         const itemIndex = item.id.substring(5);
         const list = item.parentElement.id;
-        console.log(itemIndex);
         const project = projectList[list]
         project.doneTask(+itemIndex);
         project.publishContents();
@@ -159,6 +171,9 @@ const lists = (() => {
         pubSub.publish('addProject', newEntry);
         pubSub.publish('updateProjectList', projectList);
     }
+
+    const makeProjectSub = pubSub.subscribe('makeProject',makeProject);
+    const sendQueriesSubscription = pubSub.subscribe('sendProjectQueries', sendQueries);
     const itemDoneSub = pubSub.subscribe('itemDone',itemDone);
     const newProjectSub = pubSub.subscribe('newProject',newProject);
     const publishListSub = pubSub.subscribe('publishList', list => list.publishContents())
