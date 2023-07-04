@@ -299,7 +299,7 @@ const sideBar = (() => {
     header.appendChild(newTitle)
     const sidebar = initialiseSideBar();  
     console.log('Sidebar: ' , sidebar);
-    title.addEventListener('click', () => sidebar.style.display = 'grid');
+    title.addEventListener('click', () => sidebar.style.display = 'flex');
      
   }
 
@@ -320,11 +320,14 @@ const sideBar = (() => {
     const newButton = document.createElement('button');
     newButton.classList.add('new-button');
     newButton.textContent = 'new project';
-    sidebar.appendChild(newButton);
+    const newContainer = document.createElement('div');
+    newContainer.classList.add('button-container');
+    sidebar.appendChild(newContainer);
+    newContainer.appendChild(newButton);
     const closeButton = document.createElement('button');
     closeButton.addEventListener('click', hideSidebar);
     closeButton.textContent = 'close'
-    sidebar.appendChild(closeButton);
+    newContainer.appendChild(closeButton);
     newButton.addEventListener('click',() => {pubSub.publish('makeProject')});
     body.appendChild(sidebar);
     sidebar.style.display = 'none';
@@ -404,7 +407,6 @@ const sideBar = (() => {
       dialog.close();
       dialog.innerHTML = '';
       dialog.parentElement.removeChild(dialog);
-      pubSub.publish('hideBar');
     })
     console.log(project);
 

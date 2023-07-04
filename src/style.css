@@ -13,7 +13,8 @@ html {
 body {
     margin:0;
     padding:0;
-    height: 100vh;
+    height: 100dvh;
+    width: 100dvw;
     background-color: var(--background);
 }
 
@@ -39,6 +40,14 @@ body {
 .footer a {
     color: var(--text-main);
     margin: 0.2rem 1rem;
+}
+
+.confirm-message {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
 }
 
 .button-container {
@@ -79,7 +88,7 @@ body {
     flex-direction: column;
 }
 
-#sidebar button {
+.project-list button {
     flex: 0 0 auto;
     height: 2rem;
 }
@@ -103,7 +112,6 @@ body {
 
 #sidebar {
     flex: 0 0 auto;
-    width: 10rem;
     background-color: var(--background);
     padding: 2rem;
     color: var(--text-main);
