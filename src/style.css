@@ -79,6 +79,14 @@ body {
     flex-direction: column;
 }
 
+#sidebar button {
+    flex: 0 0 auto;
+}
+
+.project-list {
+    flex: 1;
+}
+
 #content div {
     margin-right: 1rem;
 }
@@ -98,7 +106,6 @@ body {
     background-color: var(--background);
     padding: 2rem;
     color: var(--text-main);
-    border-right: 2px dashed var(--text-main);
 }
 
 .close {
