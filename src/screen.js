@@ -33,6 +33,10 @@ const screenController = (() => {
     modal.classList.add("dialog-modal");
     modal.id = 'form-modal'
     container.appendChild(modal);
+    const footer = document.createElement('div');
+    footer.classList.add('footer');
+    footer.innerHTML = "<a href='https://www.github.com/niallantony'> made by Niall Antonny </a>"
+    body.appendChild(footer);
   };
 
   const listClick = (event) => {
@@ -285,10 +289,14 @@ const sideBar = (() => {
     header.classList.add('header');
     header.id = 'header';
     body.insertBefore(header, content);
+    const newTitle = document.createElement('div');
+    newTitle.textContent = 'To-Dos'
+    newTitle.classList.add('title')
     const title = document.createElement("button");
     title.textContent = "Projects";
     title.classList.add("sidebar-title");
     header.appendChild(title);
+    header.appendChild(newTitle)
     const sidebar = initialiseSideBar();  
     console.log('Sidebar: ' , sidebar);
     title.addEventListener('click', () => sidebar.style.display = 'grid');
