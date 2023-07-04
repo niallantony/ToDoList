@@ -1,4 +1,4 @@
-import { doc } from "prettier";
+
 import pubSub from "./pubsub";
 
 const screenController = (() => {
@@ -39,37 +39,58 @@ const screenController = (() => {
     const clickedItem = event.target.closest('.list-container');
     if (!clickedItem) return;
     const clickedList = clickedItem.querySelector('.todo-item');
+    console.log(clickedItem, clickedList);
     pubSub.publish('itemMenu',clickedList);
   }
 
   const itemMenu = (item) => {
-    const menuPan = document.createElement('div');
+    const container = document.getElementById('container');
+    const menuPan = document.createElement('dialog');
     menuPan.classList.add('menu');
-    item.appendChild(menuPan);
+    container.appendChild(menuPan);
     const doneButton = document.createElement('button');
     doneButton.id = 'menu-done';
     doneButton.textContent = 'done';
     doneButton.addEventListener('click',(event) => {
       event.stopPropagation();
-      pubSub.publish('itemDone',event.target.parentElement.parentElement);
+      menuPan.close();
+      pubSub.publish('itemDone',item);
       menuPan.innerHTML = '';
       menuPan.parentElement.removeChild(menuPan);
     });
     const editButton = document.createElement('button');
     editButton.textContent = 'edit';
     editButton.id = 'menu-edit';    
-    editButton.addEventListener('click',() => pubSub.publish('itemEdit',item));
+    editButton.addEventListener('click',() => {
+      menuPan.close();
+      menuPan.innerHTML = '';
+      menuPan.parentElement.removeChild(menuPan);
+      pubSub.publish('itemEdit',item)}
+      );
     const cancelButton = document.createElement('button');
     cancelButton.textContent = 'cancel';
-    cancelButton.id = 'cancel-edit';    
+    cancelButton.id = 'menu-cancel';    
     cancelButton.addEventListener('click',(event) => {
       event.stopPropagation();
+      menuPan.close();
       menuPan.innerHTML = '';
       menuPan.parentElement.removeChild(menuPan);
     });
+    const deleteButton = document.createElement('button');
+    deleteButton.textContent = 'delete';
+    deleteButton.id = 'menu-delete';
+    deleteButton.addEventListener('click', (event) => {
+      event.stopPropagation();
+      menuPan.close();
+      pubSub.publish('itemDelete',item);
+      menuPan.innerHTML = '';
+      menuPan.parentElement.removeChild(menuPan);
+    })
+    menuPan.appendChild(deleteButton);
     menuPan.appendChild(doneButton);
     menuPan.appendChild(editButton);
     menuPan.appendChild(cancelButton);
+    menuPan.showModal();
   }
 
   const listExistError = () => {
@@ -105,7 +126,7 @@ const screenController = (() => {
 const inputModal = (() => {
   const createSelect = (projects) => {
     const selectBox = document.createElement("select");
-    selectBox.setAttribute("name", "lists");
+    selectBox.setAttribute("name", "listName");
     selectBox.id = "select-lists";
     for (const list of Object.keys(projects)) {
       const newOption = document.createElement("option");
@@ -256,15 +277,34 @@ const inputModal = (() => {
 })();
 
 const sideBar = (() => {
-  const initialiseSideBar = () => {
-    const body = document.getElementById("container");
-    const sidebar = document.createElement("div");
-    sidebar.id = "sidebar";
-    body.appendChild(sidebar);
-    const title = document.createElement("div");
+
+  const sideBarButton = () => {
+    const body = document.getElementById('container');
+    const header = document.createElement('div');
+    const content = document.getElementById('content');
+    header.classList.add('header');
+    header.id = 'header';
+    body.insertBefore(header, content);
+    const title = document.createElement("button");
     title.textContent = "Projects";
     title.classList.add("sidebar-title");
-    sidebar.appendChild(title);
+    header.appendChild(title);
+    const sidebar = initialiseSideBar();  
+    console.log('Sidebar: ' , sidebar);
+    title.addEventListener('click', () => sidebar.style.display = 'grid');
+     
+  }
+
+  const hideSidebar = () => {
+    const sidebar = document.getElementById('sidebar');
+    sidebar.style.display = 'none';
+  }
+
+  const initialiseSideBar = () => {
+    const body = document.getElementById("container");
+    const sidebar = document.createElement("dialog");
+    sidebar.id = "sidebar";
+    sidebar.classList.add('menu');
     const sidebarContent = document.createElement('div');
     sidebarContent.classList.add('project-list');
     sidebar.appendChild(sidebarContent);
@@ -273,21 +313,110 @@ const sideBar = (() => {
     newButton.classList.add('new-button');
     newButton.textContent = 'new project';
     sidebar.appendChild(newButton);
+    const closeButton = document.createElement('button');
+    closeButton.addEventListener('click', hideSidebar);
+    closeButton.textContent = 'close'
+    sidebar.appendChild(closeButton);
     newButton.addEventListener('click',() => {pubSub.publish('makeProject')});
+    body.appendChild(sidebar);
+    sidebar.style.display = 'none';
+    return sidebar;
   };
+
+  const removeProject = (project) => {
+    const projectElement = document.getElementById(`list-${project.name.replace(/\s/g,'')}`);
+    projectElement.parentElement.removeChild(projectElement);
+  }
+
+  const projectMenu = (project) => {
+    const container = document.getElementById('container');
+    const menuPan = document.createElement('dialog');
+    menuPan.classList.add('menu');
+    container.appendChild(menuPan);
+    const showButton = document.createElement('button');
+    showButton.id = 'menu-show';
+    showButton.textContent = 'show';
+    showButton.addEventListener('click', () => {
+      menuPan.close();
+      menuPan.innerHTML = '';
+      menuPan.parentElement.removeChild(menuPan);
+      pubSub.publish('publishList',project);
+      pubSub.publish('hideBar');
+    });
+    const deleteButton = document.createElement('button');
+    deleteButton.id = 'menu-delete';
+    deleteButton.textContent = 'delete';
+    deleteButton.addEventListener('click', () => {
+      menuPan.close();
+      menuPan.innerHTML = '';
+      menuPan.parentElement.removeChild(menuPan);
+      deleteConfirm(project);
+    });
+    const cancelButton = document.createElement('button');
+    cancelButton.textContent = 'cancel';
+    cancelButton.id = 'menu-cancel';    
+    cancelButton.addEventListener('click',(event) => {
+      event.stopPropagation();
+      menuPan.innerHTML = '';
+      menuPan.parentElement.removeChild(menuPan);
+      menuPan.close();
+      pubSub.publish('hideBar');
+    });    
+    menuPan.appendChild(showButton);
+    menuPan.appendChild(deleteButton);
+    menuPan.appendChild(cancelButton);
+    menuPan.showModal();
+  }
+
+  const deleteConfirm = (project) => {
+    const container = document.getElementById('container');
+    const dialog = document.createElement('dialog');
+    const confirmMessage = document.createElement('div');
+    const buttonContainer = document.createElement('div');
+    const confirmButton = document.createElement('button');
+    const cancelButton = document.createElement('button');
+    dialog.classList.add('menu');
+    container.appendChild(dialog);
+    dialog.appendChild(confirmMessage);
+    dialog.appendChild(buttonContainer);
+    buttonContainer.appendChild(confirmButton);
+    buttonContainer.appendChild(cancelButton);
+    dialog.classList.add('confirm-message');
+    dialog.show();
+    confirmMessage.textContent =  'delete project?';
+    confirmButton.textContent = 'ok';
+    cancelButton.textContent = 'cancel';
+    cancelButton.addEventListener('click', () => {
+      dialog.close();
+      dialog.innerHTML = '';
+      dialog.parentElement.removeChild(dialog);
+    });
+    confirmButton.addEventListener('click', () => {
+      pubSub.publish('deleteList',project);
+      dialog.close();
+      dialog.innerHTML = '';
+      dialog.parentElement.removeChild(dialog);
+      pubSub.publish('hideBar');
+    })
+    console.log(project);
+
+  }
 
   const addToSideBar = (project) => {
     const sidebar = document.querySelector('.project-list');
     const projectButton = document.createElement("button");
     projectButton.classList.add("project-button");
+    projectButton.id = `list-${project.name.replace(/\s/g,'')}`;
     projectButton.textContent = project.name;
-    projectButton.addEventListener('click',() => {
-      pubSub.publish('publishList',project);
-    })
     sidebar.appendChild(projectButton);
+    projectButton.addEventListener('click',() => {
+      projectMenu(project);
+    })
+    console.log("Added project: ",project.name);
   };
-
-  const makeSideBarSub = pubSub.subscribe('makeSideBar', initialiseSideBar);
+  const hideSideBarSub = pubSub.subscribe('hideBar', hideSidebar);
+  const removeProjectSub = pubSub.subscribe('deleteList', removeProject);
+  const makeSideBarSub = pubSub.subscribe('makeSideBar', sideBarButton);
   const addSideBarSubscription = pubSub.subscribe("addProject", addToSideBar);
 })();
 
