@@ -9,11 +9,11 @@
 - Simplified interface for ease of use
 
 **Things I want to implement in the future:**
-- Priority items and colour coding
-- Ordering todo items within a list
-- Ability to duplicate lists
-- Ability to add an item to several lists
-- Alerts for items that have an impending due-date
+- [ ] Priority items and colour coding
+- [ ] Ordering todo items within a list
+- [ ] Ability to duplicate lists
+- [ ] Ability to add an item to several lists
+- [ ] Alerts for items that have an impending due-date
 
 ---
 
