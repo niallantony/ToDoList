@@ -7,6 +7,7 @@
 - Ability to organise several different to-do list
 - To do items are customisable and editable
 - Simplified interface for ease of use
+- To do lists are saved and loaded using local storage if possible.
 
 **Things I want to implement in the future:**
 - [ ] Priority items and colour coding
